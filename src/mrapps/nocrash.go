@@ -6,7 +6,8 @@ package main
 // go build -buildmode=plugin nocrash.go
 //
 
-import "../mr"
+// import "../mr"
+import "mit-6.824-golabs-2020/src/mr"
 import crand "crypto/rand"
 import "math/big"
 import "strings"

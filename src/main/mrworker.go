@@ -10,7 +10,8 @@ package main
 // Please do not change this file.
 //
 
-import "../mr"
+// import "../mr"
+import "mit-6.824-golabs-2020/src/mr"
 import "plugin"
 import "os"
 import "fmt"

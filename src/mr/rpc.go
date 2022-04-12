@@ -1,5 +1,7 @@
 package mr
 
+import "time"
+
 //
 // RPC definitions.
 //
@@ -22,8 +24,59 @@ type ExampleReply struct {
 	Y int
 }
 
-// Add your RPC definitions here.
+type MrTaskType int
 
+const (
+	//TODO: add task type for idle (still waiting on in-progress tasks) and Done???
+	MapTask MrTaskType = iota
+	ReduceTask
+	WaitTask
+	DoneTask
+)
+
+type TaskState int
+
+const (
+	Idle TaskState = iota
+	InProgress
+	Completed
+)
+
+type Task struct {
+	MrTask MrTaskType
+	// Filenames []string
+	Filename  string
+	NReduce   int
+	mapNum    int
+	reduceNum int
+	Start     time.Time
+	State     TaskState
+	WorkerId  int
+}
+
+var TheWaitTask = Task{MrTask: WaitTask}
+var TheDoneTask = Task{MrTask: DoneTask}
+
+type RequestTaskArgs struct{}
+
+type RequestTaskReply struct {
+	Task Task
+}
+
+type ReportTaskDoneArgs struct {
+	Task Task
+}
+
+type ReportTaskDoneReply struct{}
+
+type ReportArgs struct{}
+
+type ReplyArgs struct{}
+
+type DoneArgs struct{}
+type DoneReply struct{}
+
+// Add your RPC definitions here.
 
 // Cook up a unique-ish UNIX-domain socket name
 // in /var/tmp, for the master.

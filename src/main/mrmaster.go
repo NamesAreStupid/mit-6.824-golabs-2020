@@ -9,7 +9,8 @@ package main
 // Please do not change this file.
 //
 
-import "../mr"
+// import "../mr"
+import "mit-6.824-golabs-2020/src/mr"
 import "time"
 import "os"
 import "fmt"
@@ -21,7 +22,9 @@ func main() {
 	}
 
 	m := mr.MakeMaster(os.Args[1:], 10)
-	for m.Done() == false {
+	args := mr.DoneArgs{}
+	reply := mr.DoneReply{}
+	for m.Done(&args, &reply) != nil {
 		time.Sleep(time.Second)
 	}
 
