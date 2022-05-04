@@ -1,14 +1,12 @@
 pkg/
 api.key
 *-handin.tar.gz
-.vscode/
 
 *.*/
 *.so
-.vscode/
 /kvpaxos/x.txt
-/main/diff.out
-/main/mr-tmp/*
+/src/main/diff.out
+/src/main/mr-tmp/*
 /mapreduce/x.txt
 /pbservice/x.txt
 824-mrinput-*.txt
