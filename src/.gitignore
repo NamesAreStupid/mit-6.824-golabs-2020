@@ -1,8 +1,10 @@
 *.*/
-mrtmp.*
-824-mrinput-*.txt
+*.so
+.vscode/
+/kvpaxos/x.txt
 /main/diff.out
+/main/mr-tmp/*
 /mapreduce/x.txt
 /pbservice/x.txt
-/kvpaxos/x.txt
-*.so
+824-mrinput-*.txt
+mrtmp.*

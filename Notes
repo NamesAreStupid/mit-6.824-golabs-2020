@@ -1,0 +1,2 @@
+- For debugging with delve the plugin needs to be built using the flag -gcflags="all=-N -l"
+    go build -buildmode=plugin -gcflags="all=-N -l" ../mrapps/wc.go

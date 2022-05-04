@@ -1,15 +1,16 @@
 package mr
 
-import "time"
+import (
+	"os"
+	"strconv"
+	"time"
+)
 
 //
 // RPC definitions.
 //
 // remember to capitalize all names.
 //
-
-import "os"
-import "strconv"
 
 //
 // example to show how to declare the arguments
@@ -46,9 +47,10 @@ type Task struct {
 	MrTask MrTaskType
 	// Filenames []string
 	Filename  string
+	NMap      int
+	MapNum    int
 	NReduce   int
-	mapNum    int
-	reduceNum int
+	ReduceNum int
 	Start     time.Time
 	State     TaskState
 	WorkerId  int

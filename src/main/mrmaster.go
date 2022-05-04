@@ -10,10 +10,13 @@ package main
 //
 
 // import "../mr"
-import "mit-6.824-golabs-2020/src/mr"
-import "time"
-import "os"
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"time"
+
+	"mit-6.824-golabs-2020/src/mr"
+)
 
 func main() {
 	if len(os.Args) < 2 {
@@ -22,9 +25,7 @@ func main() {
 	}
 
 	m := mr.MakeMaster(os.Args[1:], 10)
-	args := mr.DoneArgs{}
-	reply := mr.DoneReply{}
-	for m.Done(&args, &reply) != nil {
+	for m.Done() == false {
 		time.Sleep(time.Second)
 	}
 

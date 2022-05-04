@@ -10,12 +10,15 @@ package main
 // Please do not change this file.
 //
 
-// import "../mr"
-import "mit-6.824-golabs-2020/src/mr"
-import "plugin"
-import "os"
-import "fmt"
-import "log"
+import (
+	"fmt"
+	"log"
+	"os"
+	"plugin"
+
+	"mit-6.824-golabs-2020/src/mr"
+	// "../mr"
+)
 
 func main() {
 	if len(os.Args) != 2 {

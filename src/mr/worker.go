@@ -58,23 +58,30 @@ func Worker(mapf func(string, string) []KeyValue,
 	for {
 		args := RequestTaskArgs{}
 		reply := RequestTaskReply{}
-		done := call("Master.RequestTask", &args, &reply)
+		done := !call("Master.RequestTask", &args, &reply)
 		if done {
 			fmt.Println(doneMessage)
 			return
 		}
 
 		mrTask := reply.Task
+		fmt.Printf("Received Task: %v\n", mrTask)
 		switch mrTask.MrTask {
 		case MapTask:
+			fmt.Println("Received mapTask: " + mrTask.Filename)
 			//TODO: Does the task need an id or something so it can be reported done?
+			doMap(mapf, mrTask)
 			doneArgs := ReportTaskDoneArgs{mrTask}
 			doneReply := ReportTaskDoneReply{}
-			doMap(mapf, mrTask.Filename, mrTask.NReduce)
 			call("Master.ReportTaskDone", &doneArgs, &doneReply)
 		case ReduceTask:
-			doReduce()
+			fmt.Println("Received reduceTask: " + mrTask.Filename)
+			doReduce(reducef, mrTask)
+			doneArgs := ReportTaskDoneArgs{mrTask}
+			doneReply := ReportTaskDoneReply{}
+			call("Master.ReportTaskDone", &doneArgs, &doneReply)
 		case WaitTask:
+			fmt.Println("Received WaitTask. Sleeping...")
 			time.Sleep(time.Second)
 		case DoneTask:
 			fmt.Println(doneMessage)
@@ -100,8 +107,11 @@ func Worker(mapf func(string, string) []KeyValue,
 // 		kva := mapf(filename, string(content))
 // 		intermediate = append(intermediate, kva...)
 // 	}
-func doMap(mapf func(string, string) []KeyValue,
-	filename string, nReduce int) {
+func doMap(mapf func(string, string) []KeyValue, mrTask Task) {
+
+	filename := mrTask.Filename
+	nReduce := mrTask.NReduce
+	mapNum := mrTask.MapNum
 
 	intermediate := []KeyValue{}
 	file, err := os.Open(filename)
@@ -120,7 +130,7 @@ func doMap(mapf func(string, string) []KeyValue,
 
 	encoders := make([]*json.Encoder, nReduce)
 	for i := range encoders {
-		oFileName := mapFileName(0, i) //TODO: map task number?!?!
+		oFileName := mapFileName(mapNum, i)
 		oFile, err := os.Create(oFileName)
 		if err != nil {
 			log.Fatalf("cannot create or open %v", oFileName)
@@ -142,12 +152,50 @@ func doMap(mapf func(string, string) []KeyValue,
 
 }
 
-func doReduce() {
+func doReduce(reducef func(string, []string) string, mrTask Task) {
+	kva := []KeyValue{}
+	for i := 0; i < mrTask.NMap; i++ {
+		inFile, err := os.Open(mapFileName(i, mrTask.ReduceNum))
+		if err != nil {
+			log.Fatalf("cannot read %v", inFile)
+		}
+		dec := json.NewDecoder(inFile)
+		for {
+			var kv KeyValue
+			if err := dec.Decode(&kv); err != nil {
+				break
+			}
+			kva = append(kva, kv)
+		}
+	}
+
+	sort.Sort(ByKey(kva))
+
+	oname := "mr-out-" + strconv.Itoa(mrTask.ReduceNum)
+	ofile, _ := os.Create(oname)
+	defer ofile.Close()
+
+	i := 0
+	for i < len(kva) {
+		j := i + 1
+		for j < len(kva) && kva[j].Key == kva[i].Key {
+			j++
+		}
+		values := []string{}
+		for k := i; k < j; k++ {
+			values = append(values, kva[k].Value)
+		}
+		output := reducef(kva[i].Key, values)
+
+		fmt.Fprintf(ofile, "%v %v\n", kva[i].Key, output)
+
+		i = j
+	}
 
 }
 
 func mapFileName(mapTaskNum, reduceTaskNum int) string {
-	return "mr-map-" + strconv.Itoa(mapTaskNum) + "-" + strconv.Itoa(reduceTaskNum)
+	return "mr-" + strconv.Itoa(mapTaskNum) + "-" + strconv.Itoa(reduceTaskNum)
 }
 
 //
