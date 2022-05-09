@@ -139,7 +139,8 @@ func (m *Master) ReportTaskDone(args ReportTaskDoneArgs, reply *ReportTaskDoneRe
 	} else if workerTask.MrTask == ReduceTask {
 		for i := range m.reduceTasks {
 			task := &m.reduceTasks[i]
-			if task.Filename == workerTask.Filename {
+			// if task.Filename == workerTask.Filename {
+			if task.ReduceNum == workerTask.ReduceNum {
 				task.State = Completed
 				m.reduceComplete += 1
 				// if m.mapComplete == len(m.mapTasks) {
@@ -202,7 +203,7 @@ func (m *Master) Done() bool {
 //
 func MakeMaster(files []string, nReduce int) *Master {
 
-	fmt.Printf("Mster files: %v\n", files)
+	fmt.Printf("Master files: %v\n", files)
 	fmt.Printf("Master nReduce: %v\n", nReduce)
 
 	m := Master{}
@@ -213,7 +214,7 @@ func MakeMaster(files []string, nReduce int) *Master {
 	} else {
 		m.files = files
 		m.nReduce = nReduce
-
+		//TODO: maybe do put a uuid for uniform identification of tasks?
 		for i, f := range m.files {
 			task := Task{
 				MrTask: MapTask,

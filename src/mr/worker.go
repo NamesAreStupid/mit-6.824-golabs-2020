@@ -46,6 +46,12 @@ func ihash(key string) int {
 func Worker(mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) {
 
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(dir)
+
 	// Your worker implementation here.
 
 	// uncomment to send the Example RPC to the master.
@@ -191,7 +197,7 @@ func doReduce(reducef func(string, []string) string, mrTask Task) {
 
 		i = j
 	}
-
+	fmt.Println("Reduce Task finished.")
 }
 
 func mapFileName(mapTaskNum, reduceTaskNum int) string {
